@@ -1,7 +1,5 @@
 const nacl = require('tweetnacl');
 
-const APP_ID = process.env.APPLIC_ID;
-const TOKEN = process.env.TOKEN;
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
 const createResponse = (statusCode, body) => {
@@ -10,6 +8,18 @@ const createResponse = (statusCode, body) => {
     body: JSON.stringify(body),
     headers: { "Content-Type": "application/json" }
   };
+};
+
+const processCommand = (cmd) => {
+  switch (cmd) {
+    case "echo":
+      return {
+        "type": 4,
+        "data": { "content": "echo" }
+      };
+    default:
+      return;
+  }
 };
 
 exports.handler = async (event) => {
@@ -37,9 +47,13 @@ exports.handler = async (event) => {
       return createResponse(200, { type: 1 });
     }
     else if (message.type === 2) {
-      switch (message.data.name.toLowerCase()) {
-        default:
-          console.error("Unknown Command");
+      const cmd = message.data.name.toLowerCase();
+      const res = processCommand(cmd);
+      if (res) {
+        return createResponse(200, res);
+      }
+      else {
+        return createResponse(400, null);
       }
     }
     else {
