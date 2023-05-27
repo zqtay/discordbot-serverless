@@ -1,5 +1,7 @@
 const nacl = require('tweetnacl');
 const { InteractionType, InteractionCallbackType } = require("./types");
+const { handleEcho } = require("./commands/basic");
+
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
 const createResponse = (statusCode, body) => {
@@ -13,11 +15,7 @@ const createResponse = (statusCode, body) => {
 const processCommand = (command, options) => {
   switch (command) {
     case "echo":
-      const content = (options && options[0]) ? options[0].value : "echo";
-      return {
-        type: InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {content: content}
-      };
+      return handleEcho(options);
     default:
       return;
   }
