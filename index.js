@@ -1,6 +1,6 @@
 const nacl = require('tweetnacl');
 const { InteractionType, InteractionCallbackType } = require("./types");
-const { handleEcho } = require("./commands/basic");
+const { handleEcho, handleRelay } = require("./commands/basic");
 
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
@@ -12,10 +12,12 @@ const createResponse = (statusCode, body) => {
   };
 };
 
-const processCommand = (command, options) => {
+const processCommand = async (command, options, user) => {
   switch (command) {
     case "echo":
       return handleEcho(options);
+    case "relay":
+      return await handleRelay(options, user);
     default:
       return;
   }
@@ -48,7 +50,11 @@ exports.handler = async (event) => {
     else if (message.type === InteractionType.APPLICATION_COMMAND) {
       const command = message.data.name.toLowerCase();
       const options = message.data.options;
-      const res = processCommand(command, options);
+      // message.user: user use command in bot DM
+      // message.member.user: user use command in a channel
+      const user = message.user ? message.user : message.member.user;
+      console.log(`[APPCMD] id: ${message.id}, user: ${user?.id}, command: ${command}`);
+      const res = await processCommand(command, options, user);
       if (res) {
         return createResponse(200, res);
       }
