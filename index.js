@@ -13,9 +13,10 @@ const createResponse = (statusCode, body) => {
 const processCommand = (command, options) => {
   switch (command) {
     case "echo":
+      const content = (options && options[0]) ? options[0].value : "echo";
       return {
         type: InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {content: "echo"}
+        data: {content: content}
       };
     default:
       return;
