@@ -1,5 +1,5 @@
 const nacl = require('tweetnacl');
-
+const { InteractionType, InteractionCallbackType } = require("./types");
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
 const createResponse = (statusCode, body) => {
@@ -10,12 +10,12 @@ const createResponse = (statusCode, body) => {
   };
 };
 
-const processCommand = (cmd) => {
-  switch (cmd) {
+const processCommand = (command, options) => {
+  switch (command) {
     case "echo":
       return {
-        "type": 4,
-        "data": { "content": "echo" }
+        type: InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {content: "echo"}
       };
     default:
       return;
@@ -42,13 +42,14 @@ exports.handler = async (event) => {
 
     const message = JSON.parse(event.body);
 
-    if (message.type === 1) {
+    if (message.type === InteractionType.PING) {
       console.log("Handling Ping request");
-      return createResponse(200, { type: 1 });
+      return createResponse(200, { type: InteractionCallbackType.PONG });
     }
-    else if (message.type === 2) {
-      const cmd = message.data.name.toLowerCase();
-      const res = processCommand(cmd);
+    else if (message.type === InteractionType.APPLICATION_COMMAND) {
+      const command = message.data.name.toLowerCase();
+      const options = message.data.options;
+      const res = processCommand(command, options);
       if (res) {
         return createResponse(200, res);
       }
