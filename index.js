@@ -1,6 +1,6 @@
 const nacl = require('tweetnacl');
 const { InteractionType, InteractionCallbackType } = require("./types");
-const { handleEcho, handleRelay } = require("./commands/basic");
+const { handleEcho, handleRelay, handleRandom } = require("./commands/basic");
 
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
@@ -18,6 +18,8 @@ const processCommand = async (command, options, user) => {
       return handleEcho(options);
     case "relay":
       return await handleRelay(options, user);
+    case "random":
+      return handleRandom(options);
     default:
       return;
   }

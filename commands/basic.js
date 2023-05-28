@@ -8,6 +8,9 @@ const headers = {
   "Content-Type": "application/json"
 };
 
+const RANDOM_DEFAULT_MIN = 1;
+const RANDOM_DEFAULT_MAX = 10;
+
 const handleEcho = (options) => {
   const message = (options && options[0]) ? options[0].value : "echo";
   return {
@@ -52,6 +55,27 @@ const handleRelay = async (options, user) => {
   }
 };
 
+const handleRandom = async (options) => {
+  let min = RANDOM_DEFAULT_MIN;
+  let max = RANDOM_DEFAULT_MAX;
+  for (const option of options) {
+    switch (option.name) {
+      case "min":
+        min = option.value;
+        break;
+      case "max":
+        max = option.value;
+        break;
+      default:
+        return;
+    }
+  }
+  return {
+    type: InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
+    data: { content: `The random number between ${min} to ${max} is ${Math.floor(Math.random() * Math.floor(max - min + 1)) + min}.` }
+  };
+};
+
 const REG_ECHO = {
   name: "echo",
   type: ApplicationCommandType.CHAT_INPUT,
@@ -88,9 +112,29 @@ const REG_RELAY = {
   }]
 };
 
+const REG_RANDOM = {
+  name: "random",
+  type: ApplicationCommandType.CHAT_INPUT,
+  description: `Generate a random number. Default range is ${RANDOM_DEFAULT_MIN} to ${RANDOM_DEFAULT_MAX}.`,
+  options: [{
+    name: "min",
+    description: "Lower bound of the number range",
+    type: ApplicationCommandOptionType.INTEGER,
+    required: false
+  },
+  {
+    name: "max",
+    description: "Upper bound of the number range",
+    type: ApplicationCommandOptionType.INTEGER,
+    required: false
+  }]
+};
+
 module.exports = {
   handleEcho,
   handleRelay,
+  handleRandom,
   REG_ECHO,
-  REG_RELAY
+  REG_RELAY,
+  REG_RANDOM
 };
