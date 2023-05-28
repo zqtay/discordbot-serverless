@@ -1,6 +1,7 @@
 const axios = require('axios').default;
 
 const { REG_ECHO, REG_RELAY, REG_RANDOM } = require("../commands/basic");
+const { REG_STEAM } = require("../commands/steam");
 
 const APP_ID = process.env.APP_ID;
 const BOT_TOKEN = process.env.BOT_TOKEN;
@@ -12,7 +13,7 @@ const headers = {
   "Content-Type": "application/json"
 };
 
-let commands = [REG_ECHO, REG_RELAY, REG_RANDOM];
+let commands = [REG_ECHO, REG_RELAY, REG_RANDOM, REG_STEAM];
 
 const registerCommands = async () => {
   let res;
