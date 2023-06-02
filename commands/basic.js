@@ -58,16 +58,18 @@ const handleRelay = async (options, user) => {
 const handleRandom = async (options) => {
   let min = RANDOM_DEFAULT_MIN;
   let max = RANDOM_DEFAULT_MAX;
-  for (const option of options) {
-    switch (option.name) {
-      case "min":
-        min = option.value;
-        break;
-      case "max":
-        max = option.value;
-        break;
-      default:
-        return;
+  if (options) {
+    for (const option of options) {
+      switch (option.name) {
+        case "min":
+          min = parseInt(option.value);
+          break;
+        case "max":
+          max = parseInt(option.value);
+          break;
+        default:
+          return;
+      }
     }
   }
   return {
