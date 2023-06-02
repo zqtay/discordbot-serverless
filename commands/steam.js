@@ -1,10 +1,13 @@
 const axios = require('axios').default;
+const bigInt = require("big-integer");
 
 const { InteractionCallbackType, ApplicationCommandType, ApplicationCommandOptionType } = require("../types");
 
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 const SUBROUTE_RESOLVE_VANITY_URL = "ISteamUser/ResolveVanityURL/v0001";
 const SUBROUTE_GET_PLAYER_SUMMARIES = "ISteamUser/GetPlayerSummaries/v0002";
+
+const STEAM_ID_32BIT_MASK = 0xFFFFFFFF;
 
 const buildURI = (subroute, params) => {
   var url = `https://api.steampowered.com/${subroute}?key=${STEAM_API_KEY}&language=en_us&format=JSON`;
@@ -19,7 +22,7 @@ const getUser = async (userId) => {
   let res, body, uri;
   if (userId.startsWith('765611')) {
     data.steamId64 = userId;
-    data.steamId32 = (Number(userId) >> 32).toString();
+    data.steamId32 = bigInt(userId, 10).and(STEAM_ID_32BIT_MASK).toString();
   }
   else {
     //If argument is username
@@ -30,7 +33,7 @@ const getUser = async (userId) => {
       body = res.data;
       if (body.response.success != 1) return;
       data.steamId64 = body.response.steamid;
-      data.steamId32 = (Number(body.response.steamid) >> 32).toString();
+      data.steamId32 = bigInt(body.response.steamid, 10).and(STEAM_ID_32BIT_MASK).toString();
       body = null;
     }
     else {
